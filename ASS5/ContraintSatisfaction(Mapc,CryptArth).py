@@ -1,7 +1,6 @@
 # Assignment 5 - Constrain Satisfaction
 # 1. Map Coloring
 # 2. Cryptarithmetic
-# Name - Hasnain Merchant Div - B Roll No - 30
 from colorama import Fore, Back, Style, init
 init(strip=False)
 init(autoreset=True)
