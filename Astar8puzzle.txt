@@ -1,0 +1,200 @@
+#include <bits/stdc++.h>
+
+using namespace std;
+
+void Astar(int [3][3], int [3][3],int);
+
+int main()
+{
+    int initial[ 3][ 3] = {{1, 2, 3}, {0, 4, 6}, {7, 5, 8}};
+    int final[ 3][ 3] = {{1, 2, 3}, {4, 5, 6}, {7, 8, 0}};
+    cout<<"\n---------------------------Your initial matrix is-------------------------------\n"<<endl;
+    for(int i=0; i<3; i++)
+    {
+        for(int j=0; j<3; j++)
+        {
+            cout << setw(8) << initial[ i][ j];
+        }
+        cout<<endl;
+    }
+    cout<<"\n---------------------------Your final matrix is--------------------------------\n"<<endl;
+    for(int i=0; i<3; i++)
+    {
+        for(int j=0; j<3; j++)
+        {
+            cout << setw(8) << final[ i][ j];
+        }
+        cout<<endl;
+    }
+    cout<<"\n--------------------------------------------------------------------------------"<<endl;
+    cout<<"\n--------------------------------------------------------------------------------"<<endl;
+    cout<<"\nA STAR Algorithm\n"<<endl;
+    Astar(initial, final,0);
+    return 0;
+}
+
+void printArray(int array[ 3][ 3])
+{
+    for(int a=0; a<3; a++)
+    {
+        for(int b=0; b<3; b++)
+        {
+            cout<< setw(8) << array[ a][ b];
+        }
+        cout<<endl;
+    }
+    cout<<endl;
+}
+
+int objective_func(int start_state[3][3], int goal_state[3][3])
+{
+    int objf = 0;
+    for(int i=0; i<3; i++)
+    {
+        for(int j=0; j<3; j++)
+        {
+            if(start_state[ i][ j] > 0)
+            {
+                if (goal_state[ i][ j] != start_state[ i][ j])
+                    objf++;
+            }
+        }
+    }
+    return objf;
+}
+
+void makeMove(int temp[3][3], int move)
+{
+    int flag=0;
+    for(int i=0; i<3; i++)
+    {
+        for(int j=0; j<3; j++)
+        {
+            if(temp[ i][ j] == 0)
+            {
+                if(move==1)
+                {
+                    temp[ i][ j] = temp[ i-1][ j];
+                    temp[ i-1][ j] = 0;
+                    flag=1;
+                    break;
+                }
+                else if(move==2)
+                {
+                    temp[ i][ j] = temp[ i+1][ j];
+                    temp[ i+1][ j] = 0;
+                    flag=1;
+                    break;
+                }
+                else if(move==3)
+                {
+                    temp[ i][ j] = temp[ i][ j-1];
+                    temp[ i][ j-1] = 0;
+                    flag=1;
+                    break;
+                }
+                else
+                {
+                    temp[ i][ j] = temp[ i][ j+1];
+                    temp[ i][ j+1] = 0;
+                    flag=1;
+                    break;
+                }
+            }
+        }
+        if(flag==1)
+            break;
+    }
+}
+
+int tile_Ordering(int current_state[ 3][ 3], int goal_state[ 3][ 3], int move)
+{
+    int temp[3][3];
+    for(int i=0; i<3; i++)
+    {
+        for(int j=0; j<3; j++)
+        {
+            temp[i][j] = current_state[i][j];
+        }
+    }
+    makeMove(temp, move);
+    int objf=objective_func(temp, goal_state);
+    return objf;
+}
+
+void Astar(int start_state[3][3], int goal_state[3][3],int p)
+{
+    int arr[4] = {8, 8, 8, 8};
+    int index=0,c=0,f=0,min=9;
+    cout<<"--------------------------------------------------------------------------------"<<endl;
+    for(int i=0; i<3; i++)
+    {
+        for(int j=0; j<3; j++)
+        {
+            if (start_state[i][j] == 0)
+            {
+                f=1;
+                if(i==0)
+                {
+                    c=1;
+                    arr[0] = 8;
+                    arr[c++] =tile_Ordering(start_state, goal_state, 2);
+                }
+                if(i==1)
+                {
+                    arr[c++] =tile_Ordering(start_state, goal_state, 1);
+                    arr[c++] =tile_Ordering(start_state, goal_state, 2);
+                }
+                if(i==2)
+                {
+                    arr[c++] =tile_Ordering(start_state, goal_state, 1);
+                    arr[c++] = 8;
+                }
+                if(j==0)
+                {
+                    arr[c++] = 8;
+                    arr[c++] =tile_Ordering(start_state, goal_state, 4);
+                }
+                if(j==1)
+                {
+                    arr[c++] =tile_Ordering(start_state, goal_state, 3);
+                    arr[c++] =tile_Ordering(start_state, goal_state, 4);
+                }
+                if(j==2)
+                {
+                    arr[c++] =tile_Ordering(start_state, goal_state, 3);
+                    arr[c++] = 8;
+                }
+            }
+        }
+        if(f==1)
+            break;
+        cout<<endl;
+    }
+    
+    for(int i=c;i<4;i++)
+        arr[i] = 8;
+        
+    cout<<endl;
+    
+    for(int i=0;i<4;i++)
+    {
+        if(min>arr[i])
+        {
+            min = arr[i];
+            index = i+1;
+        }
+    }
+
+    cout<<"Objective function : "<<min<<"+"<<p+1<<"="<<min+p+1<<endl<<endl;
+    makeMove(start_state, index);
+    printArray(start_state);
+
+    if(min==0)
+    {
+        cout<<"Goal State Reached"<<endl;
+        return;
+    }
+    
+    Astar(start_state, goal_state,p+1);    
+}
